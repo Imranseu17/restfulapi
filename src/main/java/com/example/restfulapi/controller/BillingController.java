@@ -2,11 +2,9 @@ package com.example.restfulapi.controller;
 
 
 import com.example.restfulapi.model.BillInformation;
-import com.example.restfulapi.model.Bill_status;
+import com.example.restfulapi.model.BillStatus;
 import com.example.restfulapi.model.JsonType;
 import com.example.restfulapi.repository.Billrepository;
-import com.example.restfulapi.repository.Status_repository;
-import com.example.restfulapi.service.BillInformationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,12 +18,11 @@ import java.util.List;
 public class BillingController
 {
 
-    @Autowired
-    BillInformationService billInformationService;
+
     @Autowired
     Billrepository billrepository;
-    @Autowired
-    Status_repository status_repository;
+
+
 
 
 
@@ -39,9 +36,10 @@ public class BillingController
         return billrepository.findByBillNumber(bill_number);
     }
 
-    @GetMapping("/bill_Information/{bill_number}/{amount}")
-    public JsonType PayBill(@PathVariable("bill_number") String bill_number,
-                            @PathVariable("amount") Float Amount) {
+
+    @PostMapping("/bill_Information/")
+    public JsonType PayBill(@RequestParam("bill_number") String bill_number,
+                            @RequestParam("amount") Float Amount) {
         BillInformation billInformation = billrepository.findByBillNumber(bill_number);
         Float paidAmount = billInformation.getPaid_amount();
         Float totalAmount = billInformation.getTotal_amount();
@@ -52,11 +50,11 @@ public class BillingController
 
 
             if (newAmount >= totalAmount)
-                billInformation.setBillStatus(status_repository.getOne(2));
+                billInformation.setBillStatus(BillStatus.paid);
             else if (newAmount == 0)
-                billInformation.setBillStatus(status_repository.getOne(1));
+                billInformation.setBillStatus(BillStatus.pending);
             else
-                billInformation.setBillStatus(status_repository.getOne(3));
+                billInformation.setBillStatus(BillStatus.due);
 
             Float billAmount = billInformation.getBill_amount();
             Float currentAmount = billInformation.getPaid_amount();
@@ -104,10 +102,11 @@ public class BillingController
         return billInformationpendingList;
     }
 
-    @GetMapping("/updatebill_Information/{bill_number}/{cancel_remarks}")
-    public JsonType updateBillInformation(@PathVariable("bill_number") String bill_number,
-                                          @PathVariable("cancel_remarks")
-                                                  String cancel_remarks) {
+    @PostMapping("/updatebill_Information/")
+    public JsonType updateBillInformation(@RequestParam("bill_number") String bill_number,
+                                          @RequestParam(value = "cancel_remarks",
+                                                  required = false)
+                                                String cancel_remarks) {
 
         BillInformation billInformation = billrepository.findByBillNumber(bill_number);
         Float due_amount = billInformation.getBill_amount();
@@ -115,7 +114,7 @@ public class BillingController
         try {
             billInformation.setRemarks(cancel_remarks);
             billInformation.setPaid_amount(0);
-            billInformation.setBillStatus(status_repository.getOne(1));
+            billInformation.setBillStatus(BillStatus.pending);
             billInformation.setCancel_date(Date.valueOf(LocalDate.now()));
             billInformation.setDue_amount(due_amount);
 
@@ -140,37 +139,7 @@ public class BillingController
         return jsonType;
     }
 
-    @GetMapping("/updatebill_Information/{bill_number}")
-    public JsonType cancelBillInformation(@PathVariable("bill_number") String bill_number) {
 
-        BillInformation billInformation = billrepository.findByBillNumber(bill_number);
-        Float due_amount = billInformation.getBill_amount();
-
-        try {
-            billInformation.setPaid_amount(0);
-            billInformation.setBillStatus(status_repository.getOne(1));
-            billInformation.setCancel_date(Date.valueOf(LocalDate.now()));
-            billInformation.setDue_amount(due_amount);
-
-            if (billInformation.getPay_date().equals(Date.valueOf(LocalDate.now())))
-                billrepository.save(billInformation);
-            else {
-                JsonType jsonMessage = new JsonType("Date Expired",
-                        "Unable cancel payment");
-                return jsonMessage;
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-
-            JsonType jsonType = new JsonType("Unsuccessful",
-                    billInformation.getBillStatus().getMeaning());
-            return jsonType;
-        }
-
-        JsonType jsonType = new JsonType("Successful",
-                billInformation.getBillStatus().getMeaning());
-        return jsonType;
-    }
 }
 
 

@@ -1,7 +1,6 @@
 package com.example.restfulapi.repository;
 
 import com.example.restfulapi.model.BillInformation;
-import com.example.restfulapi.model.Bill_status;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
