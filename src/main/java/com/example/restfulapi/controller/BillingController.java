@@ -15,15 +15,11 @@ import java.util.List;
 
 @RestController
 @RequestMapping(value = "/api")
-public class BillingController
-{
+public class BillingController {
 
 
     @Autowired
     Billrepository billrepository;
-
-
-
 
 
     @GetMapping(value = "/bill_Information")
@@ -106,7 +102,7 @@ public class BillingController
     public JsonType updateBillInformation(@RequestParam("bill_number") String bill_number,
                                           @RequestParam(value = "cancel_remarks",
                                                   required = false)
-                                                String cancel_remarks) {
+                                                  String cancel_remarks) {
 
         BillInformation billInformation = billrepository.findByBillNumber(bill_number);
         Float due_amount = billInformation.getBill_amount();

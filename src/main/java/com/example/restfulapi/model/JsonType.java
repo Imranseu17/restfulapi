@@ -2,8 +2,8 @@ package com.example.restfulapi.model;
 
 public class JsonType {
 
-    private  String message;
-    private  String status;
+    private String message;
+    private String status;
 
     public JsonType(String message, String status) {
         this.message = message;

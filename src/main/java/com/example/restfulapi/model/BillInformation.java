@@ -180,7 +180,7 @@ public class BillInformation {
     }
 
     public BillStatus getBillStatus() {
-        return billStatus ;
+        return billStatus;
     }
 
     public void setBillStatus(BillStatus billStatus) {

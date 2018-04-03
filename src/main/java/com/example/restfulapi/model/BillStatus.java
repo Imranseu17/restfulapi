@@ -5,19 +5,17 @@ import javax.persistence.Table;
 @Table(name = "bill_status_info")
 public enum BillStatus {
 
-    none(0,"none"),
-    pending(1,"pending"),
-    paid(2,"paid"),
-    due(3,"due"),
-    cancelled(4,"cancelled");
-
-
+    none(0, "none"),
+    pending(1, "pending"),
+    paid(2, "paid"),
+    due(3, "due"),
+    cancelled(4, "cancelled");
 
 
     String meaning;
     int key;
 
-    BillStatus(int key,String meaning) {
+    BillStatus(int key, String meaning) {
         this.meaning = meaning;
         this.key = key;
     }
@@ -32,9 +30,6 @@ public enum BillStatus {
     public int getKey() {
         return key;
     }
-
-
-
 
 
     @Override
