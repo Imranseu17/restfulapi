@@ -1,10 +1,10 @@
 package com.example.restfulapi.controller;
 
 
-import com.example.restfulapi.model.BillInformation;
-import com.example.restfulapi.model.BillStatus;
+import com.example.restfulapi.model.BillingInformation;
+import com.example.restfulapi.model.BillingStatus;
 import com.example.restfulapi.model.JsonType;
-import com.example.restfulapi.repository.Billrepository;
+import com.example.restfulapi.repository.BillingRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,103 +19,108 @@ public class BillingController {
 
 
     @Autowired
-    Billrepository billrepository;
+    BillingRepository billingRepository;
 
 
-    @GetMapping(value = "/bill_Information")
-    public List<BillInformation> findAllBillInformation() {
-        return billrepository.findAll();
+    @GetMapping(value = "/billInformation")
+    public List<BillingInformation> findAllBillInformation() {
+        return billingRepository.findAll();
     }
 
-    @GetMapping(value = "/bill_Information/{bill_number}")
-    public BillInformation findoneBillInformation(@PathVariable("bill_number") String bill_number) {
-        return billrepository.findByBillNumber(bill_number);
+    @GetMapping(value = "/billInformation/{billNumber}")
+    public BillingInformation findoneBillInformation(@PathVariable("billNumber") String billNumber) {
+        return billingRepository.findByBillNumber(billNumber);
     }
 
 
-    @PostMapping("/bill_Information/")
-    public JsonType PayBill(@RequestParam("bill_number") String bill_number,
-                            @RequestParam("amount") Float Amount) {
-        BillInformation billInformation = billrepository.findByBillNumber(bill_number);
-        Float paidAmount = billInformation.getPaid_amount();
-        Float totalAmount = billInformation.getTotal_amount();
+    @PostMapping("/updatePaymentBillInformation/")
+    public JsonType PayBill(@RequestParam("billNumber") String billNumber,
+                            @RequestParam("amount") Float amount) {
+
+        BillingInformation billingInformation = billingRepository.findByBillNumber(billNumber);
+        Float paidAmount = billingInformation.getPaid_amount();
+
 
         try {
-            billInformation.setPaid_amount(Amount);
-            Float newAmount = paidAmount + Amount;
+
+            Float newAmount = paidAmount + amount;
+            Float bill_amount = billingInformation.getBill_amount();
+            Float vat_amount = billingInformation.getVat_amount();
+            Float totalAmount = bill_amount+vat_amount;
+            Float due_amount = totalAmount - newAmount;
+
 
 
             if (newAmount >= totalAmount)
-                billInformation.setBillStatus(BillStatus.paid);
+                billingInformation.setBillingStatus(BillingStatus.paid);
             else if (newAmount == 0)
-                billInformation.setBillStatus(BillStatus.pending);
+                billingInformation.setBillingStatus(BillingStatus.pending);
             else
-                billInformation.setBillStatus(BillStatus.due);
+                billingInformation.setBillingStatus(BillingStatus.due);
 
-            Float billAmount = billInformation.getBill_amount();
-            Float currentAmount = billInformation.getPaid_amount();
-            Float dueAmount = billAmount - currentAmount;
-            billInformation.setDue_amount(dueAmount);
-            billInformation.setPay_date(Date.valueOf(LocalDate.now()));
-            billrepository.save(billInformation);
+            billingInformation.setPaid_amount(newAmount);
+            billingInformation.setTotal_amount(totalAmount);
+            billingInformation.setDue_amount(due_amount);
+            billingInformation.setPay_date(Date.valueOf(LocalDate.now()));
+            billingRepository.save(billingInformation);
 
         } catch (Exception e) {
             e.printStackTrace();
             JsonType jsonType = new JsonType("Unsuccessful",
-                    billInformation.getBillStatus().getMeaning());
+                    billingInformation.getBillingStatus().getMeaning());
             return jsonType;
         }
 
         JsonType jsonType = new JsonType("Successful",
-                billInformation.getBillStatus().getMeaning());
+                billingInformation.getBillingStatus().getMeaning());
 
         return jsonType;
     }
 
 
-    @GetMapping(value = "/bill_Informations/{customer_number}")
-    public List<BillInformation> findAllUnpaidBillInformation(@PathVariable("customer_number")
-                                                                      String customer_number) {
+    @GetMapping(value = "/unpaidALLBillInformation/{customerNumber}")
+    public List<BillingInformation> findAllUnpaidBillInformation(@PathVariable("customerNumber")
+                                                                      String customerNumber) {
 
-        List<BillInformation> billInformationpendingList = new ArrayList<>();
+        List<BillingInformation> billingInformationpendingList = new ArrayList<>();
 
-        List<BillInformation> billInformationList = billrepository.
-                findAllByCustomerNumber(customer_number);
+        List<BillingInformation> billingInformationList = billingRepository.
+                findAllByCustomerNumber(customerNumber);
 
 
-        for (BillInformation billInfo : billInformationList) {
+        for (BillingInformation billInfo : billingInformationList) {
 
-            if (billInfo.getBillStatus().getMeaning().equals("pending")) {
-                billInformationpendingList.add(billInfo);
+            if (billInfo.getBillingStatus().getMeaning().equals("pending")) {
+                billingInformationpendingList.add(billInfo);
             }
 
-            if (billInfo.getBillStatus().getMeaning().equals("due")) {
+            if (billInfo.getBillingStatus().getMeaning().equals("due")) {
 
-                billInformationpendingList.add(billInfo);
+                billingInformationpendingList.add(billInfo);
             }
         }
 
-        return billInformationpendingList;
+        return billingInformationpendingList;
     }
 
-    @PostMapping("/updatebill_Information/")
-    public JsonType updateBillInformation(@RequestParam("bill_number") String bill_number,
-                                          @RequestParam(value = "cancel_remarks",
+    @PostMapping("/cancelBillInformation/")
+    public JsonType updateBillInformation(@RequestParam("billNumber") String billNumber,
+                                          @RequestParam(value = "cancelRemarks",
                                                   required = false)
-                                                  String cancel_remarks) {
+                                                  String cancelRemarks) {
 
-        BillInformation billInformation = billrepository.findByBillNumber(bill_number);
-        Float due_amount = billInformation.getBill_amount();
+        BillingInformation billingInformation = billingRepository.findByBillNumber(billNumber);
+        Float due_amount = billingInformation.getTotal_amount();
 
         try {
-            billInformation.setRemarks(cancel_remarks);
-            billInformation.setPaid_amount(0);
-            billInformation.setBillStatus(BillStatus.pending);
-            billInformation.setCancel_date(Date.valueOf(LocalDate.now()));
-            billInformation.setDue_amount(due_amount);
+            billingInformation.setRemarks(cancelRemarks);
+            billingInformation.setPaid_amount(0);
+            billingInformation.setBillingStatus(BillingStatus.cancelled);
+            billingInformation.setCancel_date(Date.valueOf(LocalDate.now()));
+            billingInformation.setDue_amount(due_amount);
 
-            if (billInformation.getPay_date().equals(Date.valueOf(LocalDate.now())))
-                billrepository.save(billInformation);
+            if (billingInformation.getPay_date().equals(Date.valueOf(LocalDate.now())))
+                billingRepository.save(billingInformation);
 
             else {
                 JsonType jsonMessage = new JsonType("Date Expired",
@@ -126,12 +131,12 @@ public class BillingController {
             e.printStackTrace();
 
             JsonType jsonType = new JsonType("Unsuccessful",
-                    billInformation.getBillStatus().getMeaning());
+                    billingInformation.getBillingStatus().getMeaning());
             return jsonType;
         }
 
         JsonType jsonType = new JsonType("Successful",
-                billInformation.getBillStatus().getMeaning());
+                billingInformation.getBillingStatus().getMeaning());
         return jsonType;
     }
 

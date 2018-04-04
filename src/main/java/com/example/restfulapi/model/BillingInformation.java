@@ -5,7 +5,7 @@ import java.sql.Date;
 
 @Entity
 @Table(name = "bill_info")
-public class BillInformation {
+public class BillingInformation {
     @Id
     @GeneratedValue
     private int id;
@@ -28,14 +28,14 @@ public class BillInformation {
 
     @Column(name = "bill_status")
     @Enumerated(EnumType.ORDINAL)
-    private BillStatus billStatus;
+    private BillingStatus billingStatus;
 
     private String cancelled_by;
     private Date cancel_date;
     private String remarks;
 
-    public BillInformation(String customerNumber, String billNumber, String utility_trnxn_id, String bank_trnxn_id, int billType, Date issue_date, float bill_amount, float vat_amount, float total_amount, float paid_amount, Date pay_date, String paid_by, float due_amount, Date due_date,
-                           BillStatus billStatus, String cancelled_by, Date cancel_date, String remarks) {
+    public BillingInformation(String customerNumber, String billNumber, String utility_trnxn_id, String bank_trnxn_id, int billType, Date issue_date, float bill_amount, float vat_amount, float total_amount, float paid_amount, Date pay_date, String paid_by, float due_amount, Date due_date,
+                              BillingStatus billingStatus, String cancelled_by, Date cancel_date, String remarks) {
         this.customerNumber = customerNumber;
         this.billNumber = billNumber;
         this.utility_trnxn_id = utility_trnxn_id;
@@ -50,13 +50,13 @@ public class BillInformation {
         this.paid_by = paid_by;
         this.due_amount = due_amount;
         this.due_date = due_date;
-        this.billStatus = billStatus;
+        this.billingStatus = billingStatus;
         this.cancelled_by = cancelled_by;
         this.cancel_date = cancel_date;
         this.remarks = remarks;
     }
 
-    public BillInformation() {
+    public BillingInformation() {
     }
 
     public int getId() {
@@ -179,12 +179,12 @@ public class BillInformation {
         this.due_date = due_date;
     }
 
-    public BillStatus getBillStatus() {
-        return billStatus;
+    public BillingStatus getBillingStatus() {
+        return billingStatus;
     }
 
-    public void setBillStatus(BillStatus billStatus) {
-        this.billStatus = billStatus;
+    public void setBillingStatus(BillingStatus billingStatus) {
+        this.billingStatus = billingStatus;
     }
 
     public String getCancelled_by() {
@@ -213,7 +213,7 @@ public class BillInformation {
 
     @Override
     public String toString() {
-        return "BillInformation{" +
+        return "BillingInformation{" +
                 "id=" + id +
                 ", customerNumber='" + customerNumber + '\'' +
                 ", billNumber='" + billNumber + '\'' +
@@ -229,7 +229,7 @@ public class BillInformation {
                 ", paid_by='" + paid_by + '\'' +
                 ", due_amount=" + due_amount +
                 ", due_date=" + due_date +
-                ", billStatus=" + billStatus +
+                ", billingStatus=" + billingStatus +
                 ", cancelled_by='" + cancelled_by + '\'' +
                 ", cancel_date=" + cancel_date +
                 ", remarks='" + remarks + '\'' +

@@ -3,7 +3,7 @@ package com.example.restfulapi.model;
 import javax.persistence.Table;
 
 @Table(name = "bill_status_info")
-public enum BillStatus {
+public enum BillingStatus {
 
     none(0, "none"),
     pending(1, "pending"),
@@ -15,12 +15,12 @@ public enum BillStatus {
     String meaning;
     int key;
 
-    BillStatus(int key, String meaning) {
+    BillingStatus(int key, String meaning) {
         this.meaning = meaning;
         this.key = key;
     }
 
-    BillStatus() {
+    BillingStatus() {
     }
 
     public String getMeaning() {
@@ -34,7 +34,7 @@ public enum BillStatus {
 
     @Override
     public String toString() {
-        return "BillStatus{" +
+        return "BillingStatus{" +
                 "meaning='" + meaning + '\'' +
                 ", key=" + key +
                 '}';
