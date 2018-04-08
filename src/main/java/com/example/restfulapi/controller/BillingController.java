@@ -6,6 +6,7 @@ import com.example.restfulapi.model.BillingStatus;
 import com.example.restfulapi.model.JsonType;
 import com.example.restfulapi.repository.BillingRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.Date;
@@ -22,18 +23,21 @@ public class BillingController {
     BillingRepository billingRepository;
 
 
-    @GetMapping(value = "/billInformation")
+
+    @PreAuthorize("hasRole('admin')")
+    @GetMapping(value = "/secured/billInformation")
     public List<BillingInformation> findAllBillInformation() {
         return billingRepository.findAll();
     }
 
-    @GetMapping(value = "/billInformation/{billNumber}")
+    @PreAuthorize("hasRole('admin')")
+    @GetMapping(value = "/secured/billInformation/{billNumber}")
     public BillingInformation findoneBillInformation(@PathVariable("billNumber") String billNumber) {
         return billingRepository.findByBillNumber(billNumber);
     }
 
-
-    @PostMapping("/updatePaymentBillInformation/")
+    @PreAuthorize("hasRole('admin')")
+    @PostMapping("/secured/updatePaymentBillInformation/")
     public JsonType PayBill(@RequestParam("billNumber") String billNumber,
                             @RequestParam("amount") Float amount) {
 
@@ -77,8 +81,8 @@ public class BillingController {
         return jsonType;
     }
 
-
-    @GetMapping(value = "/unpaidALLBillInformation/{customerNumber}")
+    @PreAuthorize("hasRole('admin')")
+    @GetMapping(value = "/secured/unpaidALLBillInformation/{customerNumber}")
     public List<BillingInformation> findAllUnpaidBillInformation(@PathVariable("customerNumber")
                                                                       String customerNumber) {
 
@@ -102,7 +106,7 @@ public class BillingController {
 
         return billingInformationpendingList;
     }
-
+    @PreAuthorize("hasRole('admin')")
     @PostMapping("/cancelBillInformation/")
     public JsonType updateBillInformation(@RequestParam("billNumber") String billNumber,
                                           @RequestParam(value = "cancelRemarks",
