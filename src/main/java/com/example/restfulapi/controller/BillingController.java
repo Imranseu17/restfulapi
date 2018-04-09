@@ -24,19 +24,19 @@ public class BillingController {
 
 
 
-    @PreAuthorize("hasRole('admin')")
+    @PreAuthorize("hasRole('stakeholder_api')")
     @GetMapping(value = "/secured/billInformation")
     public List<BillingInformation> findAllBillInformation() {
         return billingRepository.findAll();
     }
 
-    @PreAuthorize("hasRole('admin')")
+    @PreAuthorize("hasRole('stakeholder_api')")
     @GetMapping(value = "/secured/billInformation/{billNumber}")
     public BillingInformation findoneBillInformation(@PathVariable("billNumber") String billNumber) {
         return billingRepository.findByBillNumber(billNumber);
     }
 
-    @PreAuthorize("hasRole('admin')")
+    @PreAuthorize("hasRole('stakeholder_api')")
     @PostMapping("/secured/updatePaymentBillInformation/")
     public JsonType PayBill(@RequestParam("billNumber") String billNumber,
                             @RequestParam("amount") Float amount) {
@@ -81,7 +81,7 @@ public class BillingController {
         return jsonType;
     }
 
-    @PreAuthorize("hasRole('admin')")
+    @PreAuthorize("hasRole('stakeholder_api')")
     @GetMapping(value = "/secured/unpaidALLBillInformation/{customerNumber}")
     public List<BillingInformation> findAllUnpaidBillInformation(@PathVariable("customerNumber")
                                                                       String customerNumber) {
@@ -106,7 +106,7 @@ public class BillingController {
 
         return billingInformationpendingList;
     }
-    @PreAuthorize("hasRole('admin')")
+    @PreAuthorize("hasRole('stakeholder_api')")
     @PostMapping("/cancelBillInformation/")
     public JsonType updateBillInformation(@RequestParam("billNumber") String billNumber,
                                           @RequestParam(value = "cancelRemarks",
