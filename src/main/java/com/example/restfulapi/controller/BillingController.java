@@ -6,8 +6,11 @@ import com.example.restfulapi.model.BillingStatus;
 import com.example.restfulapi.model.JsonType;
 import com.example.restfulapi.repository.BillingRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.Ordered;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 import java.sql.Date;
 import java.time.LocalDate;
@@ -16,13 +19,18 @@ import java.util.List;
 
 @RestController
 @RequestMapping(value = "/api")
-public class BillingController {
+public class BillingController extends WebMvcConfigurerAdapter {
 
 
     @Autowired
     BillingRepository billingRepository;
 
 
+    @Override
+    public void addViewControllers(ViewControllerRegistry registry) {
+        registry.addViewController("/login").setViewName("customlogin");
+        registry.setOrder(Ordered.HIGHEST_PRECEDENCE);
+    }
 
     @PreAuthorize("hasRole('stakeholder_api')")
     @GetMapping(value = "/secured/billInformation")
