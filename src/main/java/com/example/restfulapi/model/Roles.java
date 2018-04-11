@@ -60,13 +60,5 @@ public class Roles {
         this.status = status;
     }
 
-    @Override
-    public String toString() {
-        return "Roles{" +
-                "id=" + id +
-                ", title='" + title + '\'' +
-                ", description='" + description + '\'' +
-                ", status=" + status +
-                '}';
-    }
+
 }

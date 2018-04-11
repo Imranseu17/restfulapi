@@ -21,7 +21,6 @@ import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 
 
 @Configuration
-@Order(Ordered.HIGHEST_PRECEDENCE)
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 @EnableJpaRepositories(basePackageClasses = UsersRepository.class)
@@ -46,15 +45,13 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         http.csrf().disable();
         http
                 .authorizeRequests()
-                .antMatchers("**/secured/**").permitAll()
-                .anyRequest().authenticated()
-                .and()
-                .formLogin()
-                .loginPage("/login")
-                .permitAll()
+                .antMatchers("**/secured/**")
+                .authenticated()
                 .and().httpBasic().and()
-                .logout()
+                .formLogin()
                 .permitAll();
+
+
     }
 
 

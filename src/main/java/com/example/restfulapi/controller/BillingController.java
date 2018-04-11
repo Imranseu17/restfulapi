@@ -19,28 +19,18 @@ import java.util.List;
 
 @RestController
 @RequestMapping(value = "/api")
-public class BillingController extends WebMvcConfigurerAdapter {
+public class BillingController  {
 
 
     @Autowired
     BillingRepository billingRepository;
 
 
-    @Override
-    public void addViewControllers(ViewControllerRegistry registry) {
-        registry.addViewController("/login").setViewName("customlogin");
-        registry.setOrder(Ordered.HIGHEST_PRECEDENCE);
-    }
+
 
     @PreAuthorize("hasRole('stakeholder_api')")
-    @GetMapping(value = "/secured/billInformation")
-    public List<BillingInformation> findAllBillInformation() {
-        return billingRepository.findAll();
-    }
-
-    @PreAuthorize("hasRole('stakeholder_api')")
-    @GetMapping(value = "/secured/billInformation/{billNumber}")
-    public BillingInformation findoneBillInformation(@PathVariable("billNumber") String billNumber) {
+    @GetMapping(value = "/secured/singleBillInformation/{billNumber}")
+    public BillingInformation findOneBillInformation(@PathVariable("billNumber") String billNumber) {
         return billingRepository.findByBillNumber(billNumber);
     }
 
@@ -90,7 +80,7 @@ public class BillingController extends WebMvcConfigurerAdapter {
     }
 
     @PreAuthorize("hasRole('stakeholder_api')")
-    @GetMapping(value = "/secured/unpaidALLBillInformation/{customerNumber}")
+    @GetMapping(value = "/secured/unpaidAllBillInformation/{customerNumber}")
     public List<BillingInformation> findAllUnpaidBillInformation(@PathVariable("customerNumber")
                                                                       String customerNumber) {
 

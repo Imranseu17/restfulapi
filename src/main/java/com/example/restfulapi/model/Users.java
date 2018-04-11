@@ -163,21 +163,5 @@ public class Users {
         this.rolesSet = rolesSet;
     }
 
-    @Override
-    public String toString() {
-        return "Users{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", userName='" + userName + '\'' +
-                ", password='" + password + '\'' +
-                ", isStakeholderUser=" + isStakeholderUser +
-                ", stakeholderID=" + stakeholderID +
-                ", createdBy='" + createdBy + '\'' +
-                ", createdTime=" + createdTime +
-                ", updatedBy='" + updatedBy + '\'' +
-                ", updatedTime=" + updatedTime +
-                ", status=" + status +
-                ", rolesSet=" + rolesSet +
-                '}';
-    }
+
 }
