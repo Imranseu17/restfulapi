@@ -36,7 +36,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
 
         auth.userDetailsService(customUsersDetailsService).
-                passwordEncoder(getPasswordEncoder());
+                passwordEncoder(passwordEncoder());
 
     }
 
@@ -56,33 +56,22 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
 
 
-    private PasswordEncoder getPasswordEncoder() {
-
-        return new PasswordEncoder() {
-            @Override
-            public String encode(CharSequence rawPassword) {
 
 
+    @Bean
+    public PasswordEncoder passwordEncoder() {
 
-               return new BCryptPasswordEncoder().encode(rawPassword.toString());
-            }
-
-
-
-            @Override
-            public boolean matches(CharSequence rawPassword,
-                                   String encodedPassword) {
-                return true;
-            }
-        };
+        return new BCryptPasswordEncoder();
     }
 
-
-
-
-
-
-
-
-
 }
+
+
+
+
+
+
+
+
+
+
