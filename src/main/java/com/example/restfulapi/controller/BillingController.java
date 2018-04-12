@@ -1,11 +1,12 @@
 package com.example.restfulapi.controller;
 
 
-import com.example.restfulapi.config.SecurityUtility;
 import com.example.restfulapi.model.*;
 import com.example.restfulapi.repository.BillingRepository;
 import com.example.restfulapi.repository.UsersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.Date;
@@ -29,7 +30,10 @@ public class BillingController {
 
 
 
-
+    @Bean
+    public static BCryptPasswordEncoder passwordEncoder(){
+        return new BCryptPasswordEncoder();
+    }
 
 
     @GetMapping(value = "/secured/singleBillInformation/{username}/{password}/{billNumber}")
@@ -42,7 +46,7 @@ public class BillingController {
         Set<Roles> rolesSet =  users.getRolesSet();
         for(Roles r: rolesSet){
             if(r.getTitle().equals("stakeholder_api")){
-                if(SecurityUtility.passwordEncoder().matches(password, users.getPassword())){
+                if(passwordEncoder().matches(password,users.getPassword())){
                     return billingRepository.findByBillNumber(billNumber);
                 }
             }
@@ -105,7 +109,7 @@ public class BillingController {
         Set<Roles> rolesSet =  users.getRolesSet();
         for(Roles r: rolesSet){
             if(r.getTitle().equals("stakeholder_api")){
-                if(SecurityUtility.passwordEncoder().matches(password, users.getPassword())){
+                if(passwordEncoder().matches(password,users.getPassword())){
                     return jsonType;
                 }
             }
@@ -147,7 +151,7 @@ public class BillingController {
         Set<Roles> rolesSet =  users.getRolesSet();
         for(Roles r: rolesSet){
             if(r.getTitle().equals("stakeholder_api")){
-                if(SecurityUtility.passwordEncoder().matches(password, users.getPassword())){
+                if(passwordEncoder().matches(password,users.getPassword())){
                     return billingInformationUnpaidList;
                 }
             }
@@ -203,7 +207,7 @@ public class BillingController {
         Set<Roles> rolesSet =  users.getRolesSet();
         for(Roles r: rolesSet){
             if(r.getTitle().equals("stakeholder_api")){
-                if(SecurityUtility.passwordEncoder().matches(password, users.getPassword())){
+                if(passwordEncoder().matches(password,users.getPassword())){
                     return jsonType;
                 }
             }
