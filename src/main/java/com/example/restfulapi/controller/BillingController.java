@@ -1,42 +1,65 @@
 package com.example.restfulapi.controller;
 
 
-import com.example.restfulapi.model.BillingInformation;
-import com.example.restfulapi.model.BillingStatus;
-import com.example.restfulapi.model.JsonType;
+import com.example.restfulapi.config.SecurityUtility;
+import com.example.restfulapi.model.*;
 import com.example.restfulapi.repository.BillingRepository;
+import com.example.restfulapi.repository.UsersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.Ordered;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping(value = "/api")
-public class BillingController  {
+public class BillingController {
+
 
 
     @Autowired
     BillingRepository billingRepository;
 
+    @Autowired
+    UsersRepository usersRepository;
 
 
 
-    @PreAuthorize("hasRole('stakeholder_api')")
-    @GetMapping(value = "/secured/singleBillInformation/{billNumber}")
-    public BillingInformation findOneBillInformation(@PathVariable("billNumber") String billNumber) {
-        return billingRepository.findByBillNumber(billNumber);
+
+
+
+
+    @GetMapping(value = "/secured/singleBillInformation/{username}/{password}/{billNumber}")
+    public BillingInformation findOneBillInformation(
+            @PathVariable("billNumber") String billNumber,
+            @PathVariable("username") String username,@PathVariable("password") String password){
+
+
+        Users  users = usersRepository.findByUserName(username);
+        Set<Roles> rolesSet =  users.getRolesSet();
+        for(Roles r: rolesSet){
+            if(r.getTitle().equals("stakeholder_api")){
+                if(SecurityUtility.passwordEncoder().matches(password, users.getPassword())){
+                    return billingRepository.findByBillNumber(billNumber);
+                }
+            }
+        }
+
+
+           return  null;
     }
 
-    @PreAuthorize("hasRole('stakeholder_api')")
+
+
+
     @PostMapping("/secured/updatePaymentBillInformation/")
-    public JsonType PayBill(@RequestParam("billNumber") String billNumber,
+    public JsonType PayBill(
+                            @RequestParam("username") String username,
+                            @RequestParam("password") String password,
+                            @RequestParam("billNumber") String billNumber,
                             @RequestParam("amount") Float amount) {
 
         BillingInformation billingInformation = billingRepository.findByBillNumber(billNumber);
@@ -64,6 +87,7 @@ public class BillingController  {
             billingInformation.setTotal_amount(totalAmount);
             billingInformation.setDue_amount(due_amount);
             billingInformation.setPay_date(Date.valueOf(LocalDate.now()));
+            billingInformation.setPaid_by(username);
             billingRepository.save(billingInformation);
 
         } catch (Exception e) {
@@ -76,15 +100,30 @@ public class BillingController  {
         JsonType jsonType = new JsonType("Successful",
                 billingInformation.getBillingStatus().getMeaning());
 
-        return jsonType;
+
+        Users  users = usersRepository.findByUserName(username);
+        Set<Roles> rolesSet =  users.getRolesSet();
+        for(Roles r: rolesSet){
+            if(r.getTitle().equals("stakeholder_api")){
+                if(SecurityUtility.passwordEncoder().matches(password, users.getPassword())){
+                    return jsonType;
+                }
+            }
+        }
+
+        JsonType unSuccessJsonType = new JsonType("Unsuccessful",
+                "username , password  is wrong");
+        return unSuccessJsonType;
     }
 
-    @PreAuthorize("hasRole('stakeholder_api')")
-    @GetMapping(value = "/secured/unpaidAllBillInformation/{customerNumber}")
-    public List<BillingInformation> findAllUnpaidBillInformation(@PathVariable("customerNumber")
-                                                                      String customerNumber) {
 
-        List<BillingInformation> billingInformationpendingList = new ArrayList<>();
+    @GetMapping(value = "/secured/unpaidAllBillInformation/{username}/{password}/{customerNumber}")
+    public List<BillingInformation> findAllUnpaidBillInformation(@PathVariable("customerNumber")
+                                                                      String customerNumber,
+                                                                 @PathVariable("username") String username,
+                                                                 @PathVariable("password") String password) {
+
+        List<BillingInformation> billingInformationUnpaidList = new ArrayList<>();
 
         List<BillingInformation> billingInformationList = billingRepository.
                 findAllByCustomerNumber(customerNumber);
@@ -93,23 +132,39 @@ public class BillingController  {
         for (BillingInformation billInfo : billingInformationList) {
 
             if (billInfo.getBillingStatus().getMeaning().equals("pending")) {
-                billingInformationpendingList.add(billInfo);
+                billingInformationUnpaidList.add(billInfo);
             }
 
             if (billInfo.getBillingStatus().getMeaning().equals("due")) {
 
-                billingInformationpendingList.add(billInfo);
+                billingInformationUnpaidList.add(billInfo);
             }
         }
 
-        return billingInformationpendingList;
+
+
+        Users  users = usersRepository.findByUserName(username);
+        Set<Roles> rolesSet =  users.getRolesSet();
+        for(Roles r: rolesSet){
+            if(r.getTitle().equals("stakeholder_api")){
+                if(SecurityUtility.passwordEncoder().matches(password, users.getPassword())){
+                    return billingInformationUnpaidList;
+                }
+            }
+        }
+
+        return null;
     }
-    @PreAuthorize("hasRole('stakeholder_api')")
-    @PostMapping("/cancelBillInformation/")
-    public JsonType updateBillInformation(@RequestParam("billNumber") String billNumber,
+
+    @PostMapping("/secured/cancelBillInformation/")
+    public JsonType updateBillInformation(
+            @RequestParam("username") String username,
+            @RequestParam("password") String password,
+            @RequestParam("billNumber") String billNumber,
                                           @RequestParam(value = "cancelRemarks",
                                                   required = false)
-                                                  String cancelRemarks) {
+                                                  String cancelRemarks
+                                           ) {
 
         BillingInformation billingInformation = billingRepository.findByBillNumber(billNumber);
         Float due_amount = billingInformation.getTotal_amount();
@@ -120,6 +175,7 @@ public class BillingController  {
             billingInformation.setBillingStatus(BillingStatus.cancelled);
             billingInformation.setCancel_date(Date.valueOf(LocalDate.now()));
             billingInformation.setDue_amount(due_amount);
+            billingInformation.setCancelled_by(username);
 
             if (billingInformation.getPay_date().equals(Date.valueOf(LocalDate.now())))
                 billingRepository.save(billingInformation);
@@ -139,8 +195,25 @@ public class BillingController  {
 
         JsonType jsonType = new JsonType("Successful",
                 billingInformation.getBillingStatus().getMeaning());
-        return jsonType;
+
+
+
+
+        Users  users = usersRepository.findByUserName(username);
+        Set<Roles> rolesSet =  users.getRolesSet();
+        for(Roles r: rolesSet){
+            if(r.getTitle().equals("stakeholder_api")){
+                if(SecurityUtility.passwordEncoder().matches(password, users.getPassword())){
+                    return jsonType;
+                }
+            }
+        }
+
+        JsonType unSuccessJsonType = new JsonType("Unsuccessful",
+                "username , password  is wrong");
+        return unSuccessJsonType;
     }
+
 
 
 }

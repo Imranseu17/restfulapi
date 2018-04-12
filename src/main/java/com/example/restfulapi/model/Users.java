@@ -2,6 +2,7 @@ package com.example.restfulapi.model;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -46,7 +47,7 @@ public class Users {
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinTable(name = "user_role",  joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"))
-    private Set<Roles> rolesSet;
+    private Set<Roles> rolesSet = new HashSet<>();
 
     public Users() {
     }
@@ -163,5 +164,21 @@ public class Users {
         this.rolesSet = rolesSet;
     }
 
-
+    @Override
+    public String toString() {
+        return "Users{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", userName='" + userName + '\'' +
+                ", password='" + password + '\'' +
+                ", isStakeholderUser=" + isStakeholderUser +
+                ", stakeholderID=" + stakeholderID +
+                ", createdBy='" + createdBy + '\'' +
+                ", createdTime=" + createdTime +
+                ", updatedBy='" + updatedBy + '\'' +
+                ", updatedTime=" + updatedTime +
+                ", status=" + status +
+                ", rolesSet=" + rolesSet +
+                '}';
+    }
 }

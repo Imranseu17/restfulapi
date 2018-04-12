@@ -2,6 +2,8 @@ package com.example.restfulapi.model;
 
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Entity
@@ -10,8 +12,8 @@ public class Roles {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "id")
-    private int id;
+    @Column(name = "roleID")
+    private int roleID;
 
     @Column(name = "title")
     private String title;
@@ -21,19 +23,20 @@ public class Roles {
 
     @Column(name = "status")
     private int status;
-
+    @ManyToMany(mappedBy = "rolesSet", cascade = CascadeType.ALL ,fetch = FetchType.EAGER)
+    List<Users> usersList = new ArrayList<>();
 
 
 
     public Roles() {
     }
 
-    public int getId() {
-        return id;
+    public int getRoleID() {
+        return roleID;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setRoleID(int roleID) {
+        this.roleID = roleID;
     }
 
     public String getTitle() {

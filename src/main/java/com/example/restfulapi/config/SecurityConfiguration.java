@@ -2,23 +2,12 @@ package com.example.restfulapi.config;
 
 
 import com.example.restfulapi.repository.UsersRepository;
-import com.example.restfulapi.service.CustomUsersDetailsService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.Ordered;
-import org.springframework.core.annotation.Order;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
-
 
 @Configuration
 @EnableWebSecurity
@@ -26,19 +15,7 @@ import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 @EnableJpaRepositories(basePackageClasses = UsersRepository.class)
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
-    @Autowired
-    private CustomUsersDetailsService customUsersDetailsService;
 
-
-
-
-    @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-
-        auth.userDetailsService(customUsersDetailsService).
-                passwordEncoder(passwordEncoder());
-
-    }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -46,10 +23,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         http
                 .authorizeRequests()
                 .antMatchers("**/secured/**")
-                .authenticated()
-                .and().httpBasic().and()
-                .formLogin()
-                .permitAll();
+                .authenticated().anyRequest().permitAll();
+
 
 
     }
@@ -58,20 +33,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
 
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
 
-        return new BCryptPasswordEncoder();
-    }
 
 }
-
-
-
-
-
-
-
-
-
-
