@@ -21,6 +21,7 @@ public class BillingController {
 
 
 
+
     @Autowired
     BillingRepository billingRepository;
 
@@ -216,6 +217,25 @@ public class BillingController {
         JsonType unSuccessJsonType = new JsonType("Unsuccessful",
                 "username , password  is wrong");
         return unSuccessJsonType;
+    }
+
+    @GetMapping(value = "/secured/currentDateBillInformation/{username}/{password}")
+    public List<BillingInformation> findOneBillInformation(
+            @PathVariable("username") String username,@PathVariable("password") String password){
+
+
+        Users  users = usersRepository.findByUserName(username);
+        Set<Roles> rolesSet =  users.getRolesSet();
+        for(Roles r: rolesSet){
+            if(r.getTitle().equals("stakeholder_api")){
+                if(passwordEncoder().matches(password,users.getPassword())){
+                    return billingRepository.findAllByIssueDate(Date.valueOf(LocalDate.now()));
+                }
+            }
+        }
+
+
+        return  null;
     }
 
 

@@ -16,7 +16,8 @@ public class BillingInformation {
     private String utility_trnxn_id;
     private String bank_trnxn_id;
     private int billType;
-    private Date issue_date;
+    @Column(name = "issueDate")
+    private Date issueDate;
     private float bill_amount;
     private float vat_amount;
     private float total_amount;
@@ -34,14 +35,14 @@ public class BillingInformation {
     private Date cancel_date;
     private String remarks;
 
-    public BillingInformation(String customerNumber, String billNumber, String utility_trnxn_id, String bank_trnxn_id, int billType, Date issue_date, float bill_amount, float vat_amount, float total_amount, float paid_amount, Date pay_date, String paid_by, float due_amount, Date due_date,
+    public BillingInformation(String customerNumber, String billNumber, String utility_trnxn_id, String bank_trnxn_id, int billType, Date issueDate, float bill_amount, float vat_amount, float total_amount, float paid_amount, Date pay_date, String paid_by, float due_amount, Date due_date,
                               BillingStatus billingStatus, String cancelled_by, Date cancel_date, String remarks) {
         this.customerNumber = customerNumber;
         this.billNumber = billNumber;
         this.utility_trnxn_id = utility_trnxn_id;
         this.bank_trnxn_id = bank_trnxn_id;
         this.billType = billType;
-        this.issue_date = issue_date;
+        this.issueDate = issueDate;
         this.bill_amount = bill_amount;
         this.vat_amount = vat_amount;
         this.total_amount = total_amount;
@@ -107,12 +108,12 @@ public class BillingInformation {
         this.billType = billType;
     }
 
-    public Date getIssue_date() {
-        return issue_date;
+    public Date getIssueDate() {
+        return issueDate;
     }
 
-    public void setIssue_date(Date issue_date) {
-        this.issue_date = issue_date;
+    public void setIssueDate(Date issueDate) {
+        this.issueDate = issueDate;
     }
 
     public float getBill_amount() {
@@ -220,7 +221,7 @@ public class BillingInformation {
                 ", utility_trnxn_id='" + utility_trnxn_id + '\'' +
                 ", bank_trnxn_id='" + bank_trnxn_id + '\'' +
                 ", billType=" + billType +
-                ", issue_date=" + issue_date +
+                ", issueDate=" + issueDate +
                 ", bill_amount=" + bill_amount +
                 ", vat_amount=" + vat_amount +
                 ", total_amount=" + total_amount +
